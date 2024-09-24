@@ -27,44 +27,126 @@ function startMenu() {
             type: "list",
             name: "choices",
             message: "What would you like to do?",
-            choices: ["New employee", "New Role", "New department", "Display all employees", "Display all roles in the department", "Update employee role", "Exit application"]
+            choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update an employee role", "Exit application"]
         }
     ]).then(({ choices }) => {
         switch (choices) {
-            case "New employee":
-                new_employee()
+            case "Add an employee":
+                new_employee();
                 break;
-            case "New Role":
-                new_role()
+            case "Add a role":
+                new_role();
                 break;
-            case "New department":
-                new_department()
+            case "Add a department":
+                new_department();
                 break;
-            case "Display all employees":
-                display_employees()
+            case "View all employees":
+                display_employees();
                 break;
-            case "Display all roles in the department":
-                display_roles()
+            case "View all roles":
+                display_roles();
                 break;
-            case "Update employee role":
-                update_role()
+            case "Update an employee role":
+                update_role();
+                break;
+            case "View all departments":
+                // You might want to add a function for viewing all departments
+                display_departments();
                 break;
             default:
-                pool.end()
-                process.exit(0)
+                pool.end();
+                process.exit(0);
         }
-    })
+    });
+}
+
+function display_departments() {
+    pool.query("SELECT id, name FROM department;")
+        .then(({ rows }) => {
+            console.table(rows);
+            startMenu();
+        })
+        .catch(err => {
+            console.error(err);
+            startMenu();
+        });
+}
+
+function display_roles() {
+    pool.query("SELECT r.id, r.title, d.name AS department FROM Role r LEFT JOIN Department d ON r.department = d.id;")
+        .then(({ rows }) => {
+            console.table(rows);
+            startMenu();
+        })
+        .catch(err => {
+            console.error(err);
+            startMenu();
+        });
+}
+
+function display_employees() {
+    pool.query("SELECT e.id, e.first_name, e.last_name, r.title, r.salary, d.name AS department FROM employee e LEFT JOIN Role r ON e.role_id = r.id LEFT JOIN Department d ON r.department = d.id;")
+        .then(({ rows }) => {
+            console.table(rows);
+            startMenu();
+        })
+        .catch(err => {
+            console.error(err);
+            startMenu();
+        });
+}
+
+function new_department() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "name",
+            message: "Enter the name of the new department:"
+        }
+    ]).then(({ name }) => {
+        pool.query("INSERT INTO department (name) VALUES ($1)", [name])
+            .then(() => {
+                console.log("Department added!");
+                startMenu();
+            })
+            .catch(err => {
+                console.error(err);
+                startMenu();
+            });
+    });
+}
+
+function new_role() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "title",
+            message: "Enter the title of the new role:"
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "Enter the salary for this role:"
+        },
+        {
+            type: "input",
+            name: "department_id",
+            message: "Enter the department ID for this role:"
+        }
+    ]).then(({ title, salary, department_id }) => {
+        pool.query("INSERT INTO Role (title, salary, department) VALUES ($1, $2, $3)", [title, salary, department_id])
+            .then(() => {
+                console.log("Role added!");
+                startMenu();
+            })
+            .catch(err => {
+                console.error(err);
+                startMenu();
+            });
+    });
 }
 
 
-function display_employees(){
-
-pool.query("SELECT e.id,e.first_name,e.last_name, r.title, r.salary, d.name from employee e left join role r on e.role_id = r.id left join department d on r.department = d.id;")
-.then(({rows}) => {
-    console.table(rows)
-    startMenu()
-})
-}
 function new_employee() {
     inquirer.prompt([
         {
@@ -93,68 +175,6 @@ function new_employee() {
                 startMenu();
             });
     });
-}
-
-function new_role() {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "title",
-            message: "Enter the title of the new role:"
-        },
-        {
-            type: "input",
-            name: "salary",
-            message: "Enter the salary for this role:"
-        },
-        {
-            type: "input",
-            name: "department_id",
-            message: "Enter the department ID for this role:"
-        }
-    ]).then(({ title, salary, department_id }) => {
-        pool.query("INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)", [title, salary, department_id])
-            .then(() => {
-                console.log("Role added!");
-                startMenu();
-            })
-            .catch(err => {
-                console.error(err);
-                startMenu();
-            });
-    });
-}
-
-function new_department() {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "name",
-            message: "Enter the name of the new department:"
-        }
-    ]).then(({ name }) => {
-        pool.query("INSERT INTO department (name) VALUES ($1)", [name])
-            .then(() => {
-                console.log("Department added!");
-                startMenu();
-            })
-            .catch(err => {
-                console.error(err);
-                startMenu();
-            });
-    });
-}
-
-function display_roles() {
-    pool.query("SELECT r.id, r.title, d.name AS department FROM role r LEFT JOIN department d ON r.department_id = d.id;")
-        .then(({ rows }) => {
-            console.table(rows);
-            startMenu();
-        })
-        .catch(err => {
-            console.error(err);
-            startMenu();
-        });
 }
 
 function update_role() {

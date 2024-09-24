@@ -10,8 +10,8 @@ Screenshot:
 
 ![Screenshot of deployed application](Screenshot.jpeg)
 
-Link to application: 
-
 ## Credits
 
 Developer: Noah McKinzie
+
+TA assisted with the functions in the index.js, including adding the exit application function. 
