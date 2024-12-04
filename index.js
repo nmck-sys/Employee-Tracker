@@ -13,7 +13,7 @@ const pool = new Pool(
         database: 'employeetracker_db'
     },
     // Callback function that logs a message once the pool is created
-    console.log(`Connected to the books_db database.`)
+    console.log(`Connected to the employeetracker_db database.`)
 )
 
 // Establish a connection to the PostgreSQL database

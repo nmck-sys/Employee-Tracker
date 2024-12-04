@@ -18,7 +18,7 @@ CREATE TABLE Role (
 CREATE TABLE employee (
   id SERIAL PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
-  last_name VARCHAR(30),\
+  last_name VARCHAR(30)
   role_id INTEGER references Role(id) ON DELETE CASCADE,
   manager_id INTEGER references employee(id) ON DELETE SET NULL
 );
